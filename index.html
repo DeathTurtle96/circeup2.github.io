@@ -129,6 +129,19 @@ body{background:#0b0f16;color:var(--text)}
   }
   .sidebar .nav button { flex: 0 0 auto !important; }
 }
+
+.games-hero{background:linear-gradient(120deg,rgba(20,184,166,.16),rgba(59,130,246,.12));border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.game-card{border:1px solid var(--border);border-radius:16px;padding:16px;background:var(--panel);display:flex;flex-direction:column;gap:10px;min-height:190px}
+.game-card h3{margin:0}.game-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.game-card .game-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.game-pill{display:inline-flex;width:max-content;padding:4px 9px;border-radius:999px;background:rgba(20,184,166,.12);color:var(--accent);font-size:11px;font-weight:700}
+.game-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.game-frame-wrap{background:#08151b;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.game-frame-wrap iframe{display:block;width:100%;height:min(72vh,720px);border:0;background:#fff}
+.game-review{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px;border:1px solid var(--border);border-radius:12px;margin-top:10px}
+.game-small{font-size:12px;color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -137,7 +150,7 @@ body{background:#0b0f16;color:var(--text)}
   <section class="auth-card"><h2 id="authTitle">Welcome back</h2><p class="muted" id="authSub">Log in to pick up where you left off.</p><div class="auth-tabs"><button id="loginTab" class="active" onclick="setAuthMode('login')">Log in</button><button id="signupTab" class="secondary" onclick="setAuthMode('signup')">Create account</button></div><form id="authForm"><div id="nameFields" class="hidden"><div class="field"><label for="displayName">Display name</label><input id="displayName" maxlength="60" placeholder="What should people call you?"></div><div class="field"><label for="username">Username</label><input id="username" minlength="3" maxlength="24" placeholder="your_username" autocapitalize="off"></div></div><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="password">Password</label><input id="password" type="password" minlength="6" required autocomplete="current-password" placeholder="At least 6 characters"></div><button id="authSubmit" class="full" type="submit">Log in</button></form><div id="authNotice"></div><p class="footer-note">Be kind, respect privacy, and only share what you're comfortable sharing.</p></section>
 </div>
 <div id="appScreen" class="app hidden">
-  <aside class="sidebar"><div class="brand"><div class="logo">C</div> CircleUp</div><nav class="nav" id="nav"><button class="active" data-view="home"><span class="nav-icon">⌂</span> Home</button><button data-view="youtube" id="videoNav"><span class="nav-icon">▶</span> Video</button><button data-view="stories"><span class="nav-icon">◉</span> Stories</button><button data-view="reels"><span class="nav-icon">▶</span> Reels</button><button data-view="discover"><span class="nav-icon">⌕</span> Discover</button><button data-view="explore"><span class="nav-icon">✦</span> Explore</button><button data-view="polls"><span class="nav-icon">◉</span> Polls</button><button data-view="saved"><span class="nav-icon">▣</span> Saved posts</button><button data-view="studio"><span class="nav-icon">▥</span> Creator Studio</button><button data-view="music"><span class="nav-icon">♫</span> Music</button><button data-view="messages"><span class="nav-icon">▤</span> Messages</button><button data-view="notifications"><span class="nav-icon">♧</span> Notifications <span id="notificationCount" class="nav-count hidden">0</span></button><button data-view="profile"><span class="nav-icon">◉</span> My profile</button><button data-view="admin" id="adminNav" class="hidden"><span class="nav-icon">⚙</span> Admin</button></nav><div class="user-mini"><div class="avatar" id="miniAvatar">C</div><div style="min-width:0;flex:1"><strong id="miniName" style="display:block;overflow:hidden;text-overflow:ellipsis">Member</strong><span class="muted tiny" id="miniHandle">@member</span></div><button class="secondary small" id="signOutBtn">Exit</button></div></aside>
+  <aside class="sidebar"><div class="brand"><div class="logo">C</div> CircleUp</div><nav class="nav" id="nav"><button class="active" data-view="home"><span class="nav-icon">⌂</span> Home</button><button data-view="youtube" id="videoNav"><span class="nav-icon">▶</span> Video</button><button data-view="stories"><span class="nav-icon">◉</span> Stories</button><button data-view="reels"><span class="nav-icon">▶</span> Reels</button><button data-view="discover"><span class="nav-icon">⌕</span> Discover</button><button data-view="explore"><span class="nav-icon">✦</span> Explore</button><button data-view="polls"><span class="nav-icon">◉</span> Polls</button><button data-view="saved"><span class="nav-icon">▣</span> Saved posts</button><button data-view="studio"><span class="nav-icon">▥</span> Creator Studio</button><button data-view="music"><span class="nav-icon">♫</span> Music</button><button data-view="games"><span class="nav-icon">▣</span> Games</button><button data-view="messages"><span class="nav-icon">▤</span> Messages</button><button data-view="notifications"><span class="nav-icon">♧</span> Notifications <span id="notificationCount" class="nav-count hidden">0</span></button><button data-view="profile"><span class="nav-icon">◉</span> My profile</button><button data-view="admin" id="adminNav" class="hidden"><span class="nav-icon">⚙</span> Admin</button></nav><div class="user-mini"><div class="avatar" id="miniAvatar">C</div><div style="min-width:0;flex:1"><strong id="miniName" style="display:block;overflow:hidden;text-overflow:ellipsis">Member</strong><span class="muted tiny" id="miniHandle">@member</span></div><button class="secondary small" id="signOutBtn">Exit</button></div></aside>
   <main class="main"><div class="topbar"><h1 id="viewTitle">Home feed</h1><span class="muted tiny" id="liveLabel">CIRCLEUP / COMMUNITY</span></div><div id="viewContent"></div></main>
   <aside class="rightcol"><section class="panel"><h3>Find your circle</h3><p class="muted tiny">Meet people, follow their updates, and build your community.</p><button class="full" onclick="showView('discover')">Discover people</button></section><section class="panel"><h3>CircleUp basics</h3><p class="muted tiny">Share thoughtfully. Keep personal information private. Report content that breaks community rules.</p><div class="footer-note">CircleUp • Built for connection</div></section></aside>
 </div>
@@ -224,8 +237,8 @@ setInterval(()=>{if(currentUser){refreshNotificationCount();if(currentView==='me
 db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;myProfile=null;$('appScreen').classList.add('hidden');$('authScreen').classList.remove('hidden');if(presenceChannel){db.removeChannel(presenceChannel);presenceChannel=null}onlineUserIds.clear()}});
 $('signOutBtn').onclick=async()=>{await db.auth.signOut();};
 $('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)});
-function showView(view){currentView=view;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));const titles={home:'Home feed',stories:'Stories',reels:'Reels & videos',discover:'Discover people',explore:'Explore community',polls:'Community polls',saved:'Saved posts',studio:'Creator Studio',music:'Music',youtube:'CircleUp Video',messages:'Messages',notifications:'Notifications',profile:'My profile',publicProfile:'Member profile',admin:'Admin dashboard'};$('viewTitle').textContent=titles[view]||'CircleUp';renderView().catch(e=>{$('viewContent').innerHTML=`<div class="panel notice error">${escapeHTML(e.message||'Could not load this section.')}</div>`})}
-async function renderView(){if(!currentUser)return;const root=$('viewContent');if(currentView==='home')return renderHome();if(currentView==='stories')return renderStories();if(currentView==='reels')return renderReels();if(currentView==='discover')return renderDiscover();if(currentView==='explore')return renderExplore();if(currentView==='polls')return renderPolls();if(currentView==='saved')return renderSavedPosts();if(currentView==='studio')return renderCreatorStudio();if(currentView==='music')return renderMusic();if(currentView==='youtube')return renderCircleUpVideo();if(currentView==='profile')return renderProfile();if(currentView==='publicProfile')return renderPublicProfile();if(currentView==='notifications'){await renderNotifications();await refreshNotificationCount();return;}if(currentView==='messages')return renderMessages();if(currentView==='admin')return renderAdmin();root.innerHTML=''}
+function showView(view){currentView=view;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));const titles={home:'Home feed',stories:'Stories',reels:'Reels & videos',discover:'Discover people',explore:'Explore community',polls:'Community polls',saved:'Saved posts',studio:'Creator Studio',music:'Music',games:'Games Arcade',youtube:'CircleUp Video',messages:'Messages',notifications:'Notifications',profile:'My profile',publicProfile:'Member profile',admin:'Admin dashboard'};$('viewTitle').textContent=titles[view]||'CircleUp';renderView().catch(e=>{$('viewContent').innerHTML=`<div class="panel notice error">${escapeHTML(e.message||'Could not load this section.')}</div>`})}
+async function renderView(){if(!currentUser)return;const root=$('viewContent');if(currentView==='home')return renderHome();if(currentView==='stories')return renderStories();if(currentView==='reels')return renderReels();if(currentView==='discover')return renderDiscover();if(currentView==='explore')return renderExplore();if(currentView==='polls')return renderPolls();if(currentView==='saved')return renderSavedPosts();if(currentView==='studio')return renderCreatorStudio();if(currentView==='music')return renderMusic();if(currentView==='games')return renderGames();if(currentView==='youtube')return renderCircleUpVideo();if(currentView==='profile')return renderProfile();if(currentView==='publicProfile')return renderPublicProfile();if(currentView==='notifications'){await renderNotifications();await refreshNotificationCount();return;}if(currentView==='messages')return renderMessages();if(currentView==='admin')return renderAdmin();root.innerHTML=''}
 async function renderProfile(){
  const root=$('viewContent');
  const {data:profile,error:profileError}=await db.from('profiles').select('id,username,display_name,bio,avatar_url,cover_url,created_at').eq('id',currentUser.id).maybeSingle();
@@ -563,6 +576,101 @@ async function shareMusicTrack(){
 }
 async function shareMusicItem(id){const {data:track,error}=await db.from('music_tracks').select('title,artist,source_type,source_url').eq('id',id).maybeSingle();if(error||!track){alert(error?.message||'Music share could not be found.');return}const shareUrl=track.source_type==='link'?track.source_url:location.href.split('#')[0]+'#music';const text=`${track.title}${track.artist?' — '+track.artist:''} on CircleUp Music`;try{if(navigator.share)await navigator.share({title:track.title,text,url:shareUrl});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(`${text}\n${shareUrl}`);alert('Music share copied.')}else prompt('Copy music share:',`${text}\n${shareUrl}`)}catch(e){if(e?.name!=='AbortError')alert('Could not share this track.')}}
 async function deleteMusicTrack(id){if(!confirm('Delete this music share?'))return;const {data:track,error}=await db.from('music_tracks').select('id,user_id,storage_path').eq('id',id).maybeSingle();if(error||!track){alert(error?.message||'Music share not found.');return}if(track.user_id!==currentUser.id){alert('You can only delete your own music shares.');return}if(track.storage_path){const {error:removeError}=await db.storage.from('circleup-music').remove([track.storage_path]);if(removeError){alert('Could not delete the audio file: '+removeError.message);return}}const {error:deleteError}=await db.from('music_tracks').delete().eq('id',id).eq('user_id',currentUser.id);if(deleteError){alert(deleteError.message);return}await renderMusic()}
+
+
+// CircleUp Community Games. Uploaded HTML runs only in a sandboxed frame.
+const CU_GAME_BUCKET='circleup-games';
+function gameEscape(s){return escapeHTML(s)}
+async function renderGames(){
+ const root=$('viewContent');
+ root.innerHTML='<section class="panel empty">Loading the Games Arcade…</section>';
+ const {data:role}=await db.from('admin_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const isAdmin=role?.role==='admin';
+ const {data:games,error}=await db.from('circleup_games').select('id,title,description,storage_path,user_id,status,created_at').order('created_at',{ascending:false}).limit(100);
+ if(error)throw new Error(error.message+' — run the CircleUp Games SQL setup shown below first.');
+ const approved=(games||[]).filter(g=>g.status==='approved');
+ const mine=(games||[]).filter(g=>g.user_id===currentUser.id&&g.status!=='approved');
+ const pending=isAdmin?(games||[]).filter(g=>g.status==='pending'):[];
+ root.innerHTML=`
+ <section class="games-hero"><span class="game-pill">CIRCLEUP ARCADE</span><h2 style="margin:10px 0 6px">Play. Create. Share.</h2><p class="muted" style="margin:0">Play community-made games or submit your own self-contained HTML5 game. New submissions are reviewed before everyone can play them.</p></section>
+ <section class="panel"><h3>Submit your own HTML5 game</h3><p class="muted tiny">Upload one self-contained <strong>.html</strong> file. Put the CSS, JavaScript, and any images/audio directly inside that file. Games are limited to 5 MB and require admin approval.</p>
+ <div class="game-form-grid"><div class="field"><label for="cuGameTitle">Game title</label><input id="cuGameTitle" maxlength="60" placeholder="My HTML5 game"></div><div class="field"><label for="cuGameFile">HTML file</label><input id="cuGameFile" type="file" accept=".html,text/html"></div></div>
+ <div class="field"><label for="cuGameDescription">Description</label><textarea id="cuGameDescription" maxlength="240" rows="2" placeholder="What is your game about?"></textarea></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="cuGamePreviewBtn" class="secondary" type="button" onclick="previewCommunityGame()">Preview game</button><button id="cuGameSubmitBtn" type="button" onclick="submitCommunityGame()">Submit for approval</button></div><div id="cuGameNotice"></div><div id="cuGamePreview" class="game-frame-wrap hidden" style="margin-top:14px"></div>
+ </section>
+ ${mine.length?`<section class="panel"><h3>Your submissions</h3>${mine.map(g=>`<div class="game-review"><div><strong>${gameEscape(g.title)}</strong><div class="game-small">${gameEscape(g.description||'No description')} · ${g.status==='pending'?'Awaiting review':'Not approved'}</div></div><span class="game-pill">${gameEscape(g.status.toUpperCase())}</span></div>`).join('')}</section>`:''}
+ ${isAdmin?`<section class="panel"><h3>Game review queue <span class="game-pill">${pending.length} pending</span></h3>${pending.length?pending.map(g=>`<div class="game-review"><div><strong>${gameEscape(g.title)}</strong><div class="game-small">${gameEscape(g.description||'No description')} · Submitted ${new Date(g.created_at).toLocaleDateString()}</div></div><div style="display:flex;gap:8px"><button onclick="reviewCommunityGame('${g.id}','approved')">Approve</button><button class="danger" onclick="reviewCommunityGame('${g.id}','rejected')">Reject</button></div></div>`).join(''):'<p class="muted">No games are waiting for review.</p>'}</section>`:''}
+ <section><h3>Community games</h3><div id="cuApprovedGames" class="games-grid">${approved.length?approved.map(g=>`<article class="game-card"><span class="game-pill">HTML5 GAME</span><h3>${gameEscape(g.title)}</h3><p>${gameEscape(g.description||'Community-made game')}</p><div class="game-actions"><button onclick="playCommunityGame('${g.id}')">Play game</button>${g.user_id===currentUser.id||isAdmin?`<button class="secondary" onclick="removeCommunityGame('${g.id}')">Remove</button>`:''}</div></article>`).join(''):'<div class="panel empty">No approved community games yet. Submit the first one!</div>'}</div></section>
+ <section class="panel"><h3>Built-in games</h3><p class="muted tiny">These small games are built directly into CircleUp and need no uploads.</p><div class="games-grid">
+ <article class="game-card"><span class="game-pill">CLASSIC</span><h3>Number Guess</h3><p>Guess the secret number from 1 to 100.</p><div class="field"><input id="cuGuessInput" type="number" min="1" max="100" placeholder="Enter a number"></div><button onclick="guessCircleNumber()">Guess</button><div id="cuGuessResult" class="game-small"></div></article>
+ <article class="game-card"><span class="game-pill">PUZZLE</span><h3>Quick Math</h3><p>Solve a quick math question.</p><strong id="cuMathQuestion">Press New Question</strong><input id="cuMathAnswer" type="number" placeholder="Your answer"><button onclick="checkCircleMath()">Check answer</button><button class="secondary" onclick="newCircleMath()">New question</button><div id="cuMathResult" class="game-small"></div></article>
+ </div></section>`;
+ window.cuGameSecret=Math.floor(Math.random()*100)+1;
+ window.cuMathExpected=null;
+ newCircleMath();
+}
+function getCommunityGameFile(){const f=$('cuGameFile')?.files?.[0];if(!f)throw new Error('Choose an HTML file first.');if(!/\.html?$/i.test(f.name)||f.size>5*1024*1024)throw new Error('Choose an HTML file that is 5 MB or smaller.');return f}
+function sandboxGameHTML(source){
+ // Restrictive CSP: inline game code is allowed, but remote scripts/network requests are blocked.
+ const csp='<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; img-src data: blob:; media-src data: blob:; font-src data:; connect-src \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'">';
+ const body=/<body[\s>]/i.test(source)?source.replace(/<head([^>]*)>/i,`<head$1>${csp}`):`<!doctype html><html><head>${csp}<meta charset="utf-8"></head><body>${source}</body></html>`;
+ return body;
+}
+async function previewCommunityGame(){
+ const box=$('cuGamePreview');try{const file=getCommunityGameFile();const source=await file.text();box.classList.remove('hidden');box.innerHTML='<div style="padding:8px;color:#fff">Preview (sandboxed)</div><iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="HTML5 game preview"></iframe>';box.querySelector('iframe').srcdoc=sandboxGameHTML(source)}catch(e){setNotice('cuGameNotice',e.message,true)}
+}
+async function submitCommunityGame(){
+ const btn=$('cuGameSubmitBtn');btn.disabled=true;setNotice('cuGameNotice','');
+ let uploadedPath=null;
+ try{
+  const title=$('cuGameTitle').value.trim(),description=$('cuGameDescription').value.trim(),file=getCommunityGameFile();
+  if(!title||title.length>60)throw new Error('Enter a title between 1 and 60 characters.');
+  if(description.length>240)throw new Error('Description must be 240 characters or fewer.');
+  const source=await file.text();
+  if(!/<html[\s>]|<!doctype html/i.test(source))throw new Error('That file does not look like a complete HTML document.');
+  const path=`${currentUser.id}/${crypto.randomUUID()}.html`;
+  const {error:uploadError}=await db.storage.from(CU_GAME_BUCKET).upload(path,file,{cacheControl:'3600',upsert:false,contentType:'text/html'});
+  if(uploadError)throw uploadError;uploadedPath=path;
+  const {error}=await db.from('circleup_games').insert({user_id:currentUser.id,title,description,storage_path:path,status:'pending'});
+  if(error)throw error;
+  $('cuGameTitle').value='';$('cuGameDescription').value='';$('cuGameFile').value='';$('cuGamePreview').classList.add('hidden');
+  setNotice('cuGameNotice','Game submitted! It will appear in the arcade after an admin approves it.');
+  await renderGames();
+ }catch(e){if(uploadedPath){try{await db.storage.from(CU_GAME_BUCKET).remove([uploadedPath])}catch(_){}}setNotice('cuGameNotice',e.message||'Could not submit game.',true)}
+ finally{btn.disabled=false}
+}
+async function playCommunityGame(id){
+ const {data:game,error}=await db.from('circleup_games').select('title,storage_path,status').eq('id',id).maybeSingle();
+ if(error||!game||game.status!=='approved'){alert(error?.message||'This game is not available.');return}
+ const {data:link,error:linkError}=await db.storage.from(CU_GAME_BUCKET).createSignedUrl(game.storage_path,300);
+ if(linkError)throw linkError;
+ const response=await fetch(link.signedUrl);if(!response.ok)throw new Error('Could not load game file.');
+ const source=await response.text(),root=$('viewContent');
+ root.innerHTML=`<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2>${gameEscape(game.title)}</h2><p class="muted tiny">Running in an isolated sandbox. The game cannot access CircleUp's page or account session.</p></div><button class="secondary" onclick="renderGames()">← Back to Games</button></div><div class="game-frame-wrap"><iframe id="cuActiveGameFrame" sandbox="allow-scripts" referrerpolicy="no-referrer" title="${gameEscape(game.title)}"></iframe></div></section>`;
+ $('cuActiveGameFrame').srcdoc=sandboxGameHTML(source);
+}
+async function reviewCommunityGame(id,status){
+ if(!['approved','rejected'].includes(status))return;
+ const {data:role}=await db.from('admin_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ if(role?.role!=='admin'){alert('Admin access required.');return}
+ const {error}=await db.from('circleup_games').update({status,reviewed_by:currentUser.id,reviewed_at:new Date().toISOString()}).eq('id',id).eq('status','pending');
+ if(error){alert(error.message);return}await renderGames();
+}
+async function removeCommunityGame(id){
+ if(!confirm('Remove this community game?'))return;
+ const {data:role}=await db.from('admin_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+ const {data:game,error}=await db.from('circleup_games').select('id,user_id,storage_path').eq('id',id).maybeSingle();
+ if(error||!game){alert(error?.message||'Game not found.');return}
+ if(game.user_id!==currentUser.id&&role?.role!=='admin'){alert('You can only remove your own games.');return}
+ const {error:removeError}=await db.storage.from(CU_GAME_BUCKET).remove([game.storage_path]);
+ if(removeError){alert(removeError.message);return}
+ const {error:deleteError}=await db.from('circleup_games').delete().eq('id',id);
+ if(deleteError){alert(deleteError.message);return}await renderGames();
+}
+function guessCircleNumber(){const v=Number($('cuGuessInput').value);if(!Number.isInteger(v)||v<1||v>100){$('cuGuessResult').textContent='Enter a whole number from 1 to 100.';return}if(v===window.cuGameSecret){$('cuGuessResult').textContent='Correct! New number generated.';window.cuGameSecret=Math.floor(Math.random()*100)+1}else $('cuGuessResult').textContent=v<window.cuGameSecret?'Too low. Try again.':'Too high. Try again.'}
+function newCircleMath(){const a=Math.floor(Math.random()*12)+1,b=Math.floor(Math.random()*12)+1,op=Math.random()<.5?'+':'×';window.cuMathExpected=op==='+'?a+b:a*b;$('cuMathQuestion').textContent=`${a} ${op} ${b} = ?`;$('cuMathAnswer').value='';$('cuMathResult').textContent=''}
+function checkCircleMath(){const v=Number($('cuMathAnswer').value);$('cuMathResult').textContent=v===window.cuMathExpected?'Correct!':'Not quite — try again.'}
+
 
 async function renderCreatorStudio(){
  const root=$('viewContent');
