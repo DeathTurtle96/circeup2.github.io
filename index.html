@@ -165,7 +165,58 @@ function timeAgo(value){const mins=Math.max(0,Math.floor((Date.now()-new Date(va
 function setNotice(id,msg,error=false){$(id).innerHTML=msg?`<div class="notice ${error?'error':''}">${escapeHTML(msg)}</div>`:''}
 function setAuthMode(mode){authMode=mode;const signup=mode==='signup';$('authTitle').textContent=signup?'Join CircleUp':'Welcome back';$('authSub').textContent=signup?'Create an account and find your people.':'Log in to pick up where you left off.';$('nameFields').classList.toggle('hidden',!signup);$('loginTab').className=signup?'secondary':'active';$('signupTab').className=signup?'active':'secondary';$('authSubmit').textContent=signup?'Create account':'Log in';$('password').autocomplete=signup?'new-password':'current-password';setNotice('authNotice','')}
 $('loginTab').onclick=()=>setAuthMode('login');$('signupTab').onclick=()=>setAuthMode('signup');
-$('authForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('authSubmit');btn.disabled=true;btn.textContent='Please wait…';setNotice('authNotice','');try{const email=$('email').value.trim(),password=$('password').value;if(authMode==='signup'){let username=$('username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');if(username.length<3)throw new Error('Username must be at least 3 letters or numbers.');const {data,error}=await db.auth.signUp({email,password,options:{data:{username,display_name:$('displayName').value.trim()||username}}});if(error)throw error;if(data.session){await boot(data.session.user)}else{setNotice('authNotice','Account created! Check your email for a confirmation link, then log in.')}}else{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;await boot(data.user)}}catch(err){setNotice('authNotice',err.message||'Something went wrong.',true)}finally{btn.disabled=false;btn.textContent=authMode==='signup'?'Create account':'Log in'}});
+$('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('authSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Please wait…';
+  setNotice('authNotice', '');
+
+  try {
+    const email = $('email').value.trim();
+    const password = $('password').value;
+
+    if (authMode === 'signup') {
+      // Restrict new CircleUp accounts to NCS school email addresses.
+      if (!email.toLowerCase().endsWith('@ncs.charter.k12.de.us')) {
+        throw new Error('CircleUp is only available to NCS school email accounts.');
+      }
+
+      let username = $('username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+      if (username.length < 3) {
+        throw new Error('Username must be at least 3 letters or numbers.');
+      }
+
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            display_name: $('displayName').value.trim() || username
+          }
+        }
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        await boot(data.session.user);
+      } else {
+        setNotice('authNotice', 'Account created! Check your email for a confirmation link, then log in.');
+      }
+    } else {
+      // Existing users can still log in normally.
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await boot(data.user);
+    }
+  } catch (err) {
+    setNotice('authNotice', err.message || 'Something went wrong.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'signup' ? 'Create account' : 'Log in';
+  }
+});
 function startPresence(){if(!currentUser)return;if(presenceChannel)db.removeChannel(presenceChannel);presenceChannel=db.channel('circleup-online',{config:{presence:{key:currentUser.id}}});presenceChannel.on('presence',{event:'sync'},()=>{const state=presenceChannel.presenceState();onlineUserIds=new Set(Object.keys(state));});presenceChannel.subscribe(status=>{if(status==='SUBSCRIBED')presenceChannel.track({user_id:currentUser.id,display_name:myProfile?.display_name||'Member',online_at:new Date().toISOString()})})}
 async function boot(user){currentUser=user;const {data:profile,error}=await db.from('profiles').select('*').eq('id',user.id).maybeSingle();if(error)throw error;if(!profile)throw new Error('Your profile is still being prepared. Please log out and try again in a moment.');myProfile=profile;startPresence();$('authScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');$('miniName').textContent=profile.display_name;$('miniHandle').textContent='@'+profile.username;$('miniAvatar').innerHTML=profile.avatar_url?`<img src="${escapeHTML(profile.avatar_url)}" alt="">`:escapeHTML(initials(profile.display_name));const {data:admin}=await db.from('admin_roles').select('user_id').eq('user_id',user.id).maybeSingle();$('adminNav').classList.toggle('hidden',!admin);showView('home');refreshNotificationCount()}
 db.auth.getSession().then(({data})=>{if(data.session)boot(data.session.user).catch(e=>{setNotice('authNotice',e.message,true);$('authScreen').classList.remove('hidden')})});
