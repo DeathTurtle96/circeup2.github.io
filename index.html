@@ -274,6 +274,81 @@ async function renderExplore(){
  await refreshExplore();
  const input=$('exploreSearch');input.oninput=()=>{exploreTerm=input.value.trim().toLowerCase();exploreTag='';renderExploreResults()};input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();runExploreSearch()}};
 }
+
+function renderPostCards(posts) {
+  return (posts || []).map(p => {
+    const author = p.profiles || {
+      display_name: "CircleUp member",
+      username: "member"
+    };
+
+    const liked = (p.likes || []).some(
+      l => l.user_id === currentUser.id
+    );
+
+    const saved = savedPostIds.has(p.id);
+
+    const adminNav = document.getElementById("adminNav");
+    const isAdmin = adminNav && !adminNav.classList.contains("hidden");
+    const canDelete = p.author_id === currentUser.id || isAdmin;
+
+    const media = p.image_url
+      ? (p.media_type === "video"
+        ? `<video class="post-video"
+             src="${escapeHTML(p.image_url)}"
+             controls playsinline preload="metadata"></video>`
+        : `<img class="post-image"
+             src="${escapeHTML(p.image_url)}"
+             alt="Post image" loading="lazy">`)
+      : "";
+
+    return `
+      <article class="panel" id="post-${p.id}">
+        <div class="post-head">
+          ${avatarHTML(author)}
+          <div class="details">
+            <strong>${escapeHTML(author.display_name || "CircleUp member")}</strong>
+            <span class="muted tiny">
+              @${escapeHTML(author.username || "member")}
+              · ${timeAgo(p.created_at)}
+            </span>
+          </div>
+
+          ${canDelete
+            ? `<button class="secondary small"
+                 onclick="deletePost('${p.id}')">Delete</button>`
+            : ""}
+        </div>
+
+        <div class="post-body">${escapeHTML(p.body || "")}</div>
+
+        ${media}
+
+        <div class="post-actions">
+          <button class="${liked ? "liked" : ""}"
+            onclick="toggleLike('${p.id}',${liked})">
+            ${liked ? "♥" : "♡"} ${(p.likes || []).length} likes
+          </button>
+
+          <button onclick="toggleComments('${p.id}')">
+            ▤ ${(p.comments || []).length} comments
+          </button>
+
+          <button class="${saved ? "liked" : ""}"
+            onclick="toggleSavePost('${p.id}',${saved})">
+            ${saved ? "▣ Saved" : "▢ Save"}
+          </button>
+
+          <button onclick="sharePost('${p.id}')">↗ Share</button>
+          <button onclick="reportPost('${p.id}')">⚑ Report</button>
+        </div>
+
+        <div id="comments-${p.id}" class="hidden"></div>
+      </article>
+    `;
+  }).join("");
+}
+
 async function refreshExplore(){
  const root=$('exploreResults');if(root)root.innerHTML='<section class="panel empty">Loading fresh posts and members…</section>';
  const [postsRes,peopleRes,followsRes,savedRes]=await Promise.all([
