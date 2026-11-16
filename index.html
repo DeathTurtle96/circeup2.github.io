@@ -593,7 +593,7 @@ async function renderGames(){
  const pending=isAdmin?(games||[]).filter(g=>g.status==='pending'):[];
  root.innerHTML=`
  <section class="games-hero"><span class="game-pill">CIRCLEUP ARCADE</span><h2 style="margin:10px 0 6px">Play. Create. Share.</h2><p class="muted" style="margin:0">Play community-made games or submit your own self-contained HTML5 game. New submissions are reviewed before everyone can play them.</p></section>
- <section class="panel"><h3>Submit your own HTML5 game</h3><p class="muted tiny">Upload one self-contained <strong>.html</strong> file. Put the CSS, JavaScript, and any images/audio directly inside that file. Games are limited to 5 MB and require admin approval.</p>
+ <section class="panel"><h3>Submit your own HTML5 game</h3><p class="muted tiny">Upload one self-contained <strong>.html</strong> file. Put the CSS, JavaScript, and any images/audio directly inside that file. Game uploads use the maximum file size allowed by your Supabase project and require admin approval.</p>
  <div class="game-form-grid"><div class="field"><label for="cuGameTitle">Game title</label><input id="cuGameTitle" maxlength="60" placeholder="My HTML5 game"></div><div class="field"><label for="cuGameFile">HTML file</label><input id="cuGameFile" type="file" accept=".html,text/html"></div></div>
  <div class="field"><label for="cuGameDescription">Description</label><textarea id="cuGameDescription" maxlength="240" rows="2" placeholder="What is your game about?"></textarea></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="cuGamePreviewBtn" class="secondary" type="button" onclick="previewCommunityGame()">Preview game</button><button id="cuGameSubmitBtn" type="button" onclick="submitCommunityGame()">Submit for approval</button></div><div id="cuGameNotice"></div><div id="cuGamePreview" class="game-frame-wrap hidden" style="margin-top:14px"></div>
@@ -609,7 +609,7 @@ async function renderGames(){
  window.cuMathExpected=null;
  newCircleMath();
 }
-function getCommunityGameFile(){const f=$('cuGameFile')?.files?.[0];if(!f)throw new Error('Choose an HTML file first.');if(!/\.html?$/i.test(f.name)||f.size>5*1024*1024)throw new Error('Choose an HTML file that is 5 MB or smaller.');return f}
+function getCommunityGameFile(){const f=$('cuGameFile')?.files?.[0];if(!f)throw new Error('Choose an HTML file first.');if(!/\.html?$/i.test(f.name))throw new Error('Choose an HTML file (.html or .htm).');return f}
 function sandboxGameHTML(source){
  // Restrictive CSP: inline game code is allowed, but remote scripts/network requests are blocked.
  const csp='<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; img-src data: blob:; media-src data: blob:; font-src data:; connect-src \'none\'; object-src \'none\'; base-uri \'none\'; form-action \'none\'">';
