@@ -933,6 +933,7 @@ async function renderAdmin(){
  <div class="admin-section-head"><h3>Polls and voting</h3><span>${polls.length} polls · ${pollVotes.length} votes loaded</span></div><div id="adminPolls">${polls.length?polls.map(po=>{const author=po.profiles?.display_name||'Member';const related=pollVotes.filter(v=>v.poll_id===po.id);const expired=new Date(po.expires_at)<=new Date();const opts=Array.isArray(po.options)?po.options:[];return `<article class="admin-card admin-filter-item" data-search="${escapeHTML((author+' '+(po.profiles?.username||'')+' '+po.question+' '+opts.join(' ')).toLowerCase())}"><div class="admin-card-main"><strong>${escapeHTML(author)} <span class="muted">@${escapeHTML(po.profiles?.username||'member')}</span></strong><div class="admin-meta">${timeAgo(po.created_at)} · ${expired?'CLOSED':'OPEN'} · ${related.length} votes · Poll ID ${escapeHTML(po.id)}</div><p>${escapeHTML(po.question)}</p><ul>${opts.map((opt,i)=>`<li>${escapeHTML(opt)} — ${related.filter(v=>v.option_index===i).length} vote${related.filter(v=>v.option_index===i).length===1?'':'s'}</li>`).join('')}</ul></div><div class="admin-actions"><button class="danger" onclick="adminDeletePoll('${po.id}')">Remove poll</button></div></article>`}).join(''):'<div class="admin-empty">No community polls yet.</div>'}</div>`;
  $('adminSearch').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.admin-filter-item').forEach(card=>card.classList.toggle('hidden',!card.dataset.search.includes(q))) });
  await renderModerationQueue();
+ await adminLoadBannedEmails();
 }
 async function adminSetFeatureRestriction(userId,feature,allowed){
  const valid=['can_post','can_comment','can_message','can_share_reels','can_share_stories','can_create_polls','can_share_music','can_upload_games','can_share_videos'];
@@ -951,10 +952,14 @@ async function adminSetFeatureRestriction(userId,feature,allowed){
 async function adminLoadBannedEmails(){
  const target=$('bannedEmailsList');if(!target)return;
  target.innerHTML='<div class="muted tiny">Loading banned emails…</div>';
- const {data,error}=await db.functions.invoke('circleup-ban-email',{body:{action:'list'}});
- if(error||data?.error){target.innerHTML=`<div class="notice error">Could not load banned emails: ${escapeHTML(data?.error||error.message)}</div>`;return}
- const bans=data?.bans||[];
- target.innerHTML=bans.length?bans.map(b=>`<article class="admin-card"><div class="admin-card-head"><div class="admin-card-main"><strong>${escapeHTML(b.email)}</strong><div class="admin-meta">Banned ${escapeHTML(new Date(b.created_at).toLocaleString())}${b.reason?' · '+escapeHTML(b.reason):''}</div><div class="admin-meta">${b.matched_user_id?'Existing account was found when banned.':'No existing account was found when banned.'}</div></div><button class="secondary" onclick="adminUnbanEmail('${escapeHTML(b.email)}')">Unban email</button></div></article>`).join(''):'<div class="admin-empty">No email addresses are currently banned.</div>';
+ try{
+  const {data,error}=await db.functions.invoke('circleup-ban-email',{body:{action:'list'}});
+  if(error||data?.error)throw new Error(data?.error||error.message||'The email-ban service did not respond.');
+  const bans=data?.bans||[];
+  target.innerHTML=bans.length?bans.map(b=>`<article class="admin-card"><div class="admin-card-head"><div class="admin-card-main"><strong>${escapeHTML(b.email)}</strong><div class="admin-meta">Banned ${escapeHTML(new Date(b.created_at).toLocaleString())}${b.reason?' · '+escapeHTML(b.reason):''}</div><div class="admin-meta">${b.matched_user_id?'Existing account was found when banned.':'No existing account was found when banned.'}</div></div><button class="secondary" onclick="adminUnbanEmail('${escapeHTML(b.email)}')">Unban email</button></div></article>`).join(''):'<div class="admin-empty">No email addresses are currently banned.</div>';
+ }catch(e){
+  target.innerHTML=`<div class="notice error">Could not load banned emails: ${escapeHTML(e?.message||String(e))}</div><button class="secondary small" style="margin-top:8px" onclick="adminLoadBannedEmails()">Try again</button>`;
+ }
 }
 async function adminBanEmail(){
  const input=$('banEmailInput'),reasonInput=$('banEmailReason');
@@ -1133,3 +1138,4 @@ async function adminDeleteReport(id){if(!confirm('Permanently delete this report
 </div>
 </body>
 </html>
+
