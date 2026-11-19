@@ -152,6 +152,21 @@ body{background:#0b0f16;color:var(--text)}
 .people-picker-person .picker-meta{min-width:0;flex:1}
 .people-picker-person img{width:38px;height:38px;border-radius:50%;object-fit:cover}
 .people-picker-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* Collapsible administrator workspace */
+.admin-menu{border:1px solid #2b4652;border-radius:18px;background:linear-gradient(150deg,#121f2b,#101720);margin:13px 0;overflow:hidden}
+.admin-menu>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;font-weight:850;color:var(--text);user-select:none}
+.admin-menu>summary::-webkit-details-marker{display:none}
+.admin-menu>summary:after{content:'＋';display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:9px;background:#19353b;color:var(--cyan);font-size:18px;transition:transform .18s}
+.admin-menu[open]>summary:after{content:'−';transform:rotate(180deg)}
+.admin-menu>summary:hover{background:#172a35}
+.admin-menu>summary .menu-hint{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:2px}
+.admin-menu-body{padding:0 14px 14px}
+.admin-menu-body>.panel{margin:8px 0}
+.admin-menu-body>.admin-section-head{margin:14px 4px 10px}
+.admin-menu-body>.admin-section-head:first-child{margin-top:8px}
+@media(max-width:700px){.admin-menu>summary{padding:14px}.admin-menu-body{padding:0 9px 10px}}
+
 </style>
 </head>
 <body>
@@ -928,7 +943,7 @@ async function renderModerationQueue(){
  const {data:events,error}=await db.from('content_moderation_events').select('id,actor_id,content_type,categories,content_text,media_url,status,created_at,reviewed_at').eq('status','pending').order('created_at',{ascending:false}).limit(50);
  if(error){root.insertAdjacentHTML('beforeend',`<section class="panel"><h3>Blocked-word review queue</h3><p class="notice error">Could not load flagged content: ${escapeHTML(error.message)}</p></section>`);return}
  const rows=events||[];
- root.insertAdjacentHTML('beforeend',`<section class="panel"><div class="admin-section-head"><h3>Blocked-word review queue</h3><span>${rows.length} pending</span></div><p class="muted tiny">Only pending flags appear here. Dismissed or reviewed flags are removed from this queue; their records remain saved for moderation history. Content shown here was not published or delivered.</p><div class="moderation-queue">${rows.length?rows.map(ev=>`<article class="admin-card"><div class="compose-foot"><strong>${escapeHTML(ev.content_type.toUpperCase())} · ${escapeHTML(ev.status)}</strong><span class="muted tiny">${timeAgo(ev.created_at)}</span></div><p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(ev.content_text)}</p><div class="admin-meta">Categories: ${escapeHTML((ev.categories||[]).join(', ')||'blocked-word filter')} · Sender ID: ${escapeHTML(ev.actor_id||'account removed')}</div>${ev.media_url?`<p><a href="${escapeHTML(ev.media_url)}" target="_blank" rel="noopener noreferrer">Review flagged image</a></p>`:''}${ev.status==='pending'?`<div class="admin-actions"><button onclick="reviewModerationEvent('${ev.id}','reviewed')">Mark reviewed</button><button class="secondary" onclick="reviewModerationEvent('${ev.id}','dismissed')">Dismiss flag</button></div>`:`<div class="muted tiny">Reviewed ${ev.reviewed_at?timeAgo(ev.reviewed_at):'previously'}</div>`}</article>`).join(''):'<div class="admin-empty">No content has been blocked by the word filter yet.</div>'}</div></section>`);
+ root.insertAdjacentHTML('beforeend',`<details class="admin-menu"><summary><span>Blocked-word review queue<span class="menu-hint">${rows.length} pending items awaiting review</span></span></summary><div class="admin-menu-body"><section class="panel"><div class="admin-section-head"><h3>Blocked-word review queue</h3><span>${rows.length} pending</span></div><p class="muted tiny">Only pending flags appear here. Dismissed or reviewed flags are removed from this queue; their records remain saved for moderation history. Content shown here was not published or delivered.</p><div class="moderation-queue">${rows.length?rows.map(ev=>`<article class="admin-card"><div class="compose-foot"><strong>${escapeHTML(ev.content_type.toUpperCase())} · ${escapeHTML(ev.status)}</strong><span class="muted tiny">${timeAgo(ev.created_at)}</span></div><p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(ev.content_text)}</p><div class="admin-meta">Categories: ${escapeHTML((ev.categories||[]).join(', ')||'blocked-word filter')} · Sender ID: ${escapeHTML(ev.actor_id||'account removed')}</div>${ev.media_url?`<p><a href="${escapeHTML(ev.media_url)}" target="_blank" rel="noopener noreferrer">Review flagged image</a></p>`:''}${ev.status==='pending'?`<div class="admin-actions"><button onclick="reviewModerationEvent('${ev.id}','reviewed')">Mark reviewed</button><button class="secondary" onclick="reviewModerationEvent('${ev.id}','dismissed')">Dismiss flag</button></div>`:`<div class="muted tiny">Reviewed ${ev.reviewed_at?timeAgo(ev.reviewed_at):'previously'}</div>`}</article>`).join(''):'<div class="admin-empty">No content has been blocked by the word filter yet.</div>'}</div></section></div></details>`);
 }
 async function reviewModerationEvent(id,status){
  if(!['reviewed','dismissed'].includes(status))return;
@@ -955,6 +970,31 @@ async function renderModeratorPanel(){
  $('modSearch').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.mod-filter-item').forEach(card=>card.classList.toggle('hidden',!card.dataset.search.includes(q))) });
  await renderModerationQueue();
  await adminLoadBannedEmails();
+}
+
+function buildAdminCollapsibleMenus(root){
+ const headingPair=(label,contentSelector)=>{
+  const h=[...root.querySelectorAll('.admin-section-head h3')].find(x=>x.textContent.trim().toLowerCase()===label.toLowerCase());
+  if(!h)return [];
+  const head=h.parentElement,content=head.nextElementSibling;
+  return content&&(!contentSelector||content.matches(contentSelector))?[head,content]:[];
+ };
+ const sectionByHeading=(label)=>[...root.querySelectorAll('section.panel')].find(sec=>sec.querySelector('.admin-section-head h3')?.textContent.trim().toLowerCase()===label.toLowerCase());
+ const byId=(id)=>root.querySelector('#'+id)?.closest('section.panel');
+ const groups=[
+  {title:'Members & access',hint:'Email bans, staff roles, member accounts and feature restrictions',nodes:[byId('banEmailInput'),sectionByHeading('Moderator appointments'),...headingPair('Member accounts','#adminUsers')]},
+  {title:'Security & system controls',hint:'Emergency lockdown, risk flags, deleted posts, activity history and message archive',nodes:[byId('lockdownStatus'),byId('adminRiskFlags'),byId('adminDeletedPosts'),byId('adminActivityLog'),byId('messageArchiveSearch')]},
+  {title:'Content moderation',hint:'Review and manage posts, comments, reports, stories and polls',nodes:[...headingPair('Post moderation','#adminPosts'),...headingPair('Comment moderation','#adminComments'),...headingPair('Reports queue','#adminReports'),...headingPair('Stories moderation','#adminStories'),...headingPair('Polls and voting','#adminPolls')]}
+ ];
+ for(const group of groups){
+  const nodes=[...new Set(group.nodes.filter(Boolean))].filter(n=>n.isConnected).sort((a,b)=>a.compareDocumentPosition(b)&Node.DOCUMENT_POSITION_FOLLOWING?-1:1);
+  if(!nodes.length)continue;
+  const details=document.createElement('details');details.className='admin-menu';
+  const summary=document.createElement('summary');
+  summary.innerHTML=`<span>${group.title}<span class="menu-hint">${group.hint}</span></span>`;
+  const body=document.createElement('div');body.className='admin-menu-body';
+  details.append(summary,body);nodes[0].before(details);nodes.forEach(n=>body.appendChild(n));
+ }
 }
 
 async function renderAdmin(){
@@ -1001,6 +1041,7 @@ async function renderAdmin(){
  <div class="admin-section-head"><h3>Reports queue</h3><span>${reports.length} reports</span></div><div id="adminReports">${reports.length?reports.map(r=>`<article class="admin-card admin-filter-item" data-search="${escapeHTML(((r.reason||'')+' '+(r.details||'')+' '+(r.status||'')+' '+(r.reporter?.username||'')+' '+(r.reported_user?.username||'')).toLowerCase())}"><div class="compose-foot"><strong>Report · ${escapeHTML(r.status)}</strong><span class="muted tiny">${timeAgo(r.created_at)}</span></div><div class="admin-meta"><strong>Reported by:</strong> ${escapeHTML(r.reporter?.display_name||'Unknown member')} (@${escapeHTML(r.reporter?.username||'unknown')})</div><div class="admin-meta"><strong>Reported account:</strong> ${r.reported_user?`${escapeHTML(r.reported_user.display_name||'Member')} (@${escapeHTML(r.reported_user.username||'unknown')})`:'Not available'}</div><div class="admin-meta"><strong>Content:</strong> ${escapeHTML(r.target_label|| (r.post_id?'Post':r.comment_id?'Comment':r.message_id?'Message':'Account'))} · ${escapeHTML(r.post_id||r.comment_id||r.message_id||r.reported_user_id||'')}</div><p><strong>Reason:</strong> ${escapeHTML(r.reason_category||'Other')}</p><p style="white-space:pre-wrap">${escapeHTML(r.details||r.reason||'No details supplied')}</p>${r.target_excerpt?`<div class="admin-meta"><strong>Reported content:</strong><p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(r.target_excerpt)}</p></div>`:''}<div class="admin-actions"><select id="status-${r.id}" style="max-width:190px"><option ${r.status==='open'?'selected':''}>open</option><option ${r.status==='reviewing'?'selected':''}>reviewing</option><option ${r.status==='resolved'?'selected':''}>resolved</option><option ${r.status==='dismissed'?'selected':''}>dismissed</option></select><button onclick="updateReport('${r.id}')">Save status</button><button class="danger" onclick="adminDeleteReport('${r.id}')">Delete report</button></div></article>`).join(''):'<div class="admin-empty">No reports to review.</div>'}</div>
  <div class="admin-section-head"><h3>Stories moderation</h3><span>${stories.length} recent stories</span></div><div id="adminStories">${stories.length?stories.map(st=>`<article class="admin-card admin-filter-item" data-search="${escapeHTML(((st.profiles?.display_name||'')+' '+(st.profiles?.username||'')+' '+(st.caption||'')).toLowerCase())}"><div class="admin-card-head"><div class="admin-card-main"><strong>${escapeHTML(st.profiles?.display_name||'Member')} <span class="muted">@${escapeHTML(st.profiles?.username||'member')}</span></strong><div class="admin-meta">${timeAgo(st.created_at)} · ${new Date(st.expires_at)<=new Date()?'EXPIRED':'ACTIVE'} · ${escapeHTML(st.media_type||'media')}</div>${st.caption?`<p>${escapeHTML(st.caption)}</p>`:''}${st.media_type==='image'?`<img class="post-image" src="${escapeHTML(st.media_url)}" alt="Story media" loading="lazy">`:`<a href="${escapeHTML(st.media_url)}" target="_blank" rel="noopener">Open story video</a>`}</div></div><div class="admin-actions"><button class="danger" onclick="adminDeleteStory('${st.id}')">Remove story</button></div></article>`).join(''):'<div class="admin-empty">No stories found.</div>'}</div>
  <div class="admin-section-head"><h3>Polls and voting</h3><span>${polls.length} polls · ${pollVotes.length} votes loaded</span></div><div id="adminPolls">${polls.length?polls.map(po=>{const author=po.profiles?.display_name||'Member';const related=pollVotes.filter(v=>v.poll_id===po.id);const expired=new Date(po.expires_at)<=new Date();const opts=Array.isArray(po.options)?po.options:[];return `<article class="admin-card admin-filter-item" data-search="${escapeHTML((author+' '+(po.profiles?.username||'')+' '+po.question+' '+opts.join(' ')).toLowerCase())}"><div class="admin-card-main"><strong>${escapeHTML(author)} <span class="muted">@${escapeHTML(po.profiles?.username||'member')}</span></strong><div class="admin-meta">${timeAgo(po.created_at)} · ${expired?'CLOSED':'OPEN'} · ${related.length} votes · Poll ID ${escapeHTML(po.id)}</div><p>${escapeHTML(po.question)}</p><ul>${opts.map((opt,i)=>`<li>${escapeHTML(opt)} — ${related.filter(v=>v.option_index===i).length} vote${related.filter(v=>v.option_index===i).length===1?'':'s'}</li>`).join('')}</ul></div><div class="admin-actions"><button class="danger" onclick="adminDeletePoll('${po.id}')">Remove poll</button></div></article>`}).join(''):'<div class="admin-empty">No community polls yet.</div>'}</div>`;
+ buildAdminCollapsibleMenus(root);
  $('adminSearch').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.admin-filter-item').forEach(card=>card.classList.toggle('hidden',!card.dataset.search.includes(q))) });
  await renderModerationQueue();
  await adminLoadBannedEmails();
